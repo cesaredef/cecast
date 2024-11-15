@@ -1,6 +1,6 @@
 # _cecast_
 CoEstimating Contamination And Split Time
-Maximum likelihood Estimate of human Contamination And Split Time in low-coverage archaic samples.
+
 
 ## Table of contents
 * [General info](#general-info)
@@ -12,6 +12,7 @@ Maximum likelihood Estimate of human Contamination And Split Time in low-coverag
 
 
 ## General info
+cecast is a maximum likelihood estimate of human contamination and split time in low-coverage archaic samples.
 The likelihood is calculated using coalescent simulations that generates the expectations for the number of ancestral and derived sites for all possibile class of sites, using _M-Y-A-V-C-D_ high-coverage genomes, where _M_ is modern human Mbuti, _Y_ is modern human Yoruba, _A_ is Altai Neandertal, _V_ is Vindija Neandertal, _C_ is Chagyrskaya Neandertal and _D_ is Denisova. The simulations also include modern human, European which experienced 2.5% gene flow from Neandertals around 70 kya.  
 
 
