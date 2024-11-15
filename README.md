@@ -24,9 +24,12 @@ The likelihood is calculated using coalescent simulations that generates the exp
 
 ## Other necessary files 
 
-*  `infosites_MYAVCD_manifesto_anc3out4CBGO_dist50bp_some_humans.bed.gz` bed file with the informative sites and the infos necessary to create input files for cecast.
+*  `cecast_funtions.R` functions to be loaded.
 
-This is an example of the bed file with the informative sites (~9.9 millions) which is necessary to generate the input file, like the lineage assignment. The file should be indexed with ```tabix -p bed infosites*.gz``` before running the `bam2cecast.py`.
+*  `infosites_MYAVCD_manifesto_anc3out4CBGO_dist50bp_some_humans.bed.gz` bed file with the informative sites and the infos necessary to create input files for cecast.
+   The file should be indexed with ```tabix -p bed infosites*.gz``` before running the `bam2cecast.py`.
+
+This is an example of the bed file with the informative sites (~9.9 millions) which is necessary to generate the input file, like the lineage assignment. Columns 1,2 and 3 are the chromosome, start and end coordinates, columns 4 and 5 the ancestral and derived alleles, column 6 specify the ancestry type and the lineage, and the rest of the columns are the alleles in 10 modern humans.  
 
 ```
 zcat infosites_MYAVCD_manifesto_anc3out4CBGO_dist50bp_some_humans.bed.gz | head -n 10
@@ -43,14 +46,13 @@ zcat infosites_MYAVCD_manifesto_anc3out4CBGO_dist50bp_some_humans.bed.gz | head 
 ```
 
 ## Generate input
-I describe the pipeline by using a few examples: 1) Denisova4 and 2) Oase1.  
+I describe the pipeline by using an example of 100,000 sequences from Mezmaskaya1 bam files that can be downloaded from here [https://bioinf.eva.mpg.de/SpAl/downloads/example.bam]: 
 
 ```
 infosites=infosites_MYAVCD_manifesto_anc3out4CBGO_dist50bp_some_humans.bed.gz
-BAM=/mnt/sequencedb/PopGen/cesare/ecast/0_bams/Denisova4.chrs.rmdup.L30MQ1.mapL.noIndels.bam
-bam2cecast.py -l 32 -L 100 -RISE -d 3,3 -s ${infosites} -m 25 -b 10 ${BAM} > testsample_L32MQ25_deam3.tabs
-bam2cecast.py -l 34 -L 100 -RISE -s ${sites} -m ${m} -b 10 ${bam} > ${i}_${r}_L34MQ${m}_w_hum.tabs
-
+bam2cecast.py -l 30 -L 100 -IRES -s ${infosites} -m 25 -b 10 example.bam > example_L30MQ25.tabs
+bam2cecast.py -l 30 -L 100 -IREF -s ${infosites} -m 25 -b 10 example.bam > example_L30MQ25_sf_loose.tabs
+bam2cecast.py -l 30 -L 100 -IRES -d 3,3 -s ${infosites} -m 25 -b 10 example.bam > example_L30MQ25_deam3.tabs
 ```
 
 The `-IRES` option means that it filters for indels (`-I`), randomly samples one read (`-R`), excludes reads that are neither ancestral or derived in the INFO file (`-E`) and does the strand-specific orientation sampling (`-S`). Option `-m` is the mappping quality, which can be skept if the mappability by length filter (desfribed in de Filippo et al. 2018) is applied before. The input will be a lineage assignment like table but in blocks of 10Mb specified by the `-b` option.
@@ -79,12 +81,10 @@ and with the columns of the output:
 * _**comments**_ reports whether there are other likelihhod values that do not pass the likelihood ratio test, i.e. when the difference between the max and these values is lower than 3.4. As for _boot_ column, it reports the fraction of different populations split.  
 
 
-In order to have a more precise estimate of contamination, we can change the values of the grid to look for with the option `-c`. The default `-c 0,1,0.01` is to search from 0% to 100% in steps of 1%. This is the argument passed to the R-function _seq()_; therefore, to search in steps of 0.1% use `-c 0,1,0.001`. However, this will slow down the procedure because there are 10 times more values for the contamination to be considered. 
-Nevertheless, since the estimates are between 63% and 69%, we could ask to look between 60% and 70% with `-c 0.6,0.7,0.001`. This will be as fast as before: both with 101 total values to consider. 
 In order to save some time, it is possible to constrain on the split time range with the option `-t`. This should be done only after a first estimate so that the constrain is within the plausible ranges, which in this example would be between 60 and 150 kya. 
 
 ```
-cecast -p AncientCtrl -c 0.6,0.7,0.001 -t 60,150 lin_den4.tabs
+cecast -p AncientCtrl -t 60,150 lin_den4.tabs
 #t 	t_low 	t_high 	pop 	c 	c_low 	c_high 	logLike 	c_source	nseq	boot	comments 	
 92	72	132	den	0.665	0.6334	0.685	-195.2035	AncientCtrl	16456	data
 ```
