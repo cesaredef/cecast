@@ -1,4 +1,5 @@
-# _ecast_
+# _cecast_
+CoEstimating Contamination And Split Time
 Maximum likelihood Estimate of human Contamination And Split Time in low-coverage archaic samples.
 
 ## Table of contents
