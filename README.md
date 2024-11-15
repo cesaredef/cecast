@@ -46,7 +46,7 @@ zcat infosites_MYAVCD_manifesto_anc3out4CBGO_dist50bp_some_humans.bed.gz | head 
 ```
 
 ## Generate input
-I describe the pipeline by using an example of 100,000 sequences from Mezmaskaya1 bam files that can be downloaded from here [https://bioinf.eva.mpg.de/SpAl/downloads/example.bam]: 
+I describe the pipeline by using an example of 100,000 sequences from Mezmaskaya1 bam file that can be downloaded from here [https://bioinf.eva.mpg.de/SpAl/downloads/example.bam]: 
 
 ```
 infosites=infosites_MYAVCD_manifesto_anc3out4CBGO_dist50bp_some_humans.bed.gz
