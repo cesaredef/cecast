@@ -18,10 +18,12 @@ The likelihood is calculated using coalescent simulations that generates the exp
 
 ## Necessary scripts
 
-* `bam2cecast.py` prepare the input file. It can also generate a pileup with quite a few options at informative sites.
+* `bam2cecast.py` prepare the input file from bam file. It can also generate a pileup with quite a few options at informative sites.
    (some standard python libraries are required, but you can check the script.)
 
-*  `cecast.R` runs the estimate with R and requires the following libraries: argparse, parallel, RColorBrewer and fields   
+* `vcf2cecast.py` prepare the input file from vcf file. It also does something else. 
+
+*  `cecast.R` runs the estimate with R and requires the following libraries: argparse, parallel, RColorBrewer, fields, and jsonlite.   
 
 
 ## Other necessary files 
@@ -48,7 +50,7 @@ zcat infosites_MYAVCD_manifesto_anc3out4CBGO_dist50bp_some_humans.bed.gz | head 
 ```
 
 ## Generate input
-I describe the pipeline by using an example of 100,000 sequences from Mezmaskaya1 bam file that can be downloaded from here [https://bioinf.eva.mpg.de/SpAl/downloads/example.bam]: 
+I describe the pipeline by using an example of 100,000 sequences from Mezmaskaya1 bam file that can be downloaded from [here](https://bioinf.eva.mpg.de/SpAl/downloads/example.bam): 
 
 ```
 infosites=infosites_MYAVCD_manifesto_anc3out4CBGO_dist50bp_some_humans.bed.gz
@@ -57,23 +59,19 @@ bam2cecast.py -l 30 -L 100 -IREF -s ${infosites} -m 25 -b 10 example.bam > examp
 bam2cecast.py -l 30 -L 100 -IRES -d 3,3 -s ${infosites} -m 25 -b 10 example.bam > example_L30MQ25_deam3.tabs
 ```
 
-The `-IRES` option means that it filters for indels (`-I`), randomly samples one read (`-R`), excludes reads that are neither ancestral or derived in the INFO file (`-E`) and does the strand-specific orientation sampling (`-S`). Option `-m` is the mappping quality, which can be skept if the mappability by length filter (desfribed in de Filippo et al. 2018) is applied before. The input will be a lineage assignment like table but in blocks of 10Mb specified by the `-b` option.
+The `-IRES` option means that it filters for indels (`-I`), randomly samples one read (`-R`), excludes reads that are neither ancestral or derived in the INFO file (`-E`) and does the strand-specific orientation sampling (`-S`). Option `-m` is the mappping quality, which can be skept if the mappability by length filter, desfribed in [de Filippo et al. 2018](https://bioinf.eva.mpg.de/MapL/), is applied before. The input will be a lineage assignment like table but in blocks of 10Mb specified by the `-b` option.
 
 
 ## Run estimate
 ```
-cecast -p Ancient lin_den4.tabs
-#t 	t_low 	t_high 	pop 	c 	c_low 	c_high 	logLike 	c_source	nseq	boot	comments 	
-92	72	132	den	0.66	0.63	0.6852	-195.3644	AncientCtrl	16456	data		
-Warning message:
-(-p) population: Sample AncientCtrl is taken but Ancient was specified. 
+cecast data/example_L30MQ25.tabs 
+#t t_low t_high pop c      c_low  c_high logLike 	c_source nseq chr  boot                 comments 	
+90 75    90     vin 0.0664	0.0486 0.0933 -131.5178 Yoruba   1108 1:22 data:vin=52%,cha=48% 57_estimates_with_logLike<3.4:vin=54%,cha=14%,v-c=32%
 ```
-where
-* `-p Ancient` uses our _Ancient Control_ as source of human contamination. There are also other humans samples from the SGDP, of which Yoruba is the default. Notice that this produces the *Warning message* since the name specified with the `-p` option does not perfectly match. There is also the option to use simulations by specifing `-p sim` (or `sims`, `simulations`, `Simulat`, etc... all case insensitive), but this has lower precision than using real samples since simulations are always (a bit or a lot) different from the truth. 
 
-and with the columns of the output:
+with the columns of the output:
 * _**t**_, _**t_low**_ and _**t_up**_ are the estimate, the lower and upper intervals of split time in kya using 4x29 as scaling coalescent unit (29 are the years per generation).
-* _**pop**_ is the lineage or population from which splits (see genealogy in fig X)
+* _**pop**_ is the lineage or population from which the test sample splits.
 * _**c**_, _**c_low**_ and _**c_up**_ are the estimate, the lower and upper intervals of human contamination.
 * _**logLike**_ is the log of the maximum likelihood values which is the point estimate.
 * _**c_source**_ is the source of contamination specified by the otion `-p`. 
@@ -82,8 +80,13 @@ and with the columns of the output:
 * _**boot**_ is the type of bootstrap (`-b` option) generated from uncertainity in data, history and both. Eventually, it reports the fraction of bootstraps supporting different split populations. 
 * _**comments**_ reports whether there are other likelihhod values that do not pass the likelihood ratio test, i.e. when the difference between the max and these values is lower than 3.4. As for _boot_ column, it reports the fraction of different populations split.  
 
+Here, follows a description of some options but look at the help of cecast to see all options.
 
-In order to save some time, it is possible to constrain on the split time range with the option `-t`. This should be done only after a first estimate so that the constrain is within the plausible ranges, which in this example would be between 60 and 150 kya. 
+* `-p` is the source of human contamination (dfault _Yoruba_). There are also other nine human samples from the SGDP. 
+* `-r` is the reference human sample (default _Mbuti_) used for the lineage assignment. The other option is _Yoruba_ but notice that it will not produce reliable results if _Yoruba_ is also the source of contamination. 
+
+
+It is possible to constrain on the split time range with the option `-t`, in order to save some time although this gain is marginal since the method run already quite fast (less than a minute). This should be done only after a first estimate so that the constrain is within the plausible ranges, which in this example would be between 70 and 100 kya. 
 
 ```
 cecast -p AncientCtrl -t 60,150 lin_den4.tabs
@@ -91,29 +94,30 @@ cecast -p AncientCtrl -t 60,150 lin_den4.tabs
 92	72	132	den	0.665	0.6334	0.685	-195.2035	AncientCtrl	16456	data
 ```
 
-Notice that both estimates are slightly different, but the second one is better since the likelihood is slightly higher, although not signifincatly so. This can be done when there is the need of knowing the precise estimate of contamination, for instance to use contamination to correct some other estimates.   
 
-It is possible to change the source of human contamination with `-p`. There are samples from the SGDP (see help message for the full list) and the ancient control. The former are using genotypes and the latter is using reads of short lengths to mimic ancient DNA.
-It is also possible to use simulations as source of contamination (i.e. a simulated European). However, in my experience this always leads to underestimates since the simulated source of contamination is more likely to differ from the real one.  
-If nothing is specified the default is to use Yoruba as contaminant. 
+It is possible to change the source of human contamination with `-p`. There are samples from the SGDP (see help message for the full list).
+
 
 Here it is an excample of using different source of contamination. The following bash command loop over the different sources and store the different estimates (more friendly) in results_c_source.tsv.    
 ```
 OUT=results_c_source.tsv
-SAMPLES='Gambian French Sardinian Japanese Papuan  AncientCtrl Simulations'
-cecast lin_den4.tabs > ${OUT}
-for s in ${SAMPLES} ; do cecast -p ${s} lin_den4.tabs | sed 1d; done >> ${OUT}
+SAMPLES='Dai French Han Mandenka Mbuti Papuan San Sardinian Karitiana'
+cecast data/example_L30MQ25.tabs > ${OUT}
+for s in ${SAMPLES} ; do cecast -p ${s} data/example_L30MQ25.tabs | sed 1d; done >> ${OUT}
 
 column -t ${OUT}
-#t   t_low  t_high  pop  c     c_low   c_high  logLike    c_source       nseq   chr   boot  comments
-132  92     180     den  0.62  0.5748  0.65    -221.0021  S_Yoruba-1     16456  1:22  data
-132  74     177     den  0.62  0.58    0.66    -219.8928  S_Gambian-2    16456  1:22  data
-112  72     147     den  0.64  0.6048  0.67    -216.4896  S_French-2     16456  1:22  data
-112  72     140     den  0.64  0.6148  0.67    -215.311   S_Sardinian-2  16456  1:22  data
-112  72     147     den  0.64  0.61    0.67    -216.2334  S_Japanese-2   16456  1:22  data
-92   72     117     den  0.66  0.64    0.6852  -214.9521  S_Papuan-14    16456  1:22  data
-92   72     132     den  0.66  0.6348  0.6852  -195.3644  AncientCtrl    16456  1:22  data
-217  182    247     den  0.51  0.47    0.54    -288.4961  simulation     16456  1:22  data
+#t  t_low  t_high  pop  c       c_low   c_high  logLike    c_source   nseq  chr   boot                  comments
+90  75     90      vin  0.0664  0.0498  0.0952  -131.5178  Yoruba     1108  1:22  data:vin=57%,cha=43%  57_estimates_with_logLike<3.4:vin=54%,cha=14%,v-c=32%
+90  75     90      vin  0.0659  0.0501  0.1061  -131.5083  Sardinian  1108  1:22  data:vin=69%,cha=31%  57_estimates_with_logLike<3.4:vin=54%,cha=14%,v-c=32%
+90  75     90      vin  0.0664  0.0525  0.0978  -131.4173  French     1108  1:22  data:vin=56%,cha=44%  57_estimates_with_logLike<3.4:vin=53%,cha=14%,v-c=33%
+90  84     90      cha  0.0707  0.0526  0.1682  -131.254   Han        1108  1:22  data:vin=44%,cha=56%  57_estimates_with_logLike<3.4:vin=54%,cha=14%,v-c=32%
+90  75     90      vin  0.0671  0.0556  0.1018  -131.0246  Mandenka   1108  1:22  data:vin=50%,cha=50%  57_estimates_with_logLike<3.4:vin=54%,cha=14%,v-c=32%
+90  75     90      vin  0.0571  0.0439  0.0997  -132.8482  Mbuti      1108  1:22  data:vin=63%,cha=37%  57_estimates_with_logLike<3.4:vin=53%,cha=14%,v-c=33%
+90  84     90      cha  0.0746  0.0588  0.1256  -130.5146  Papuan     1108  1:22  data:vin=32%,cha=68%  56_estimates_with_logLike<3.4:vin=54%,cha=14%,v-c=32%
+90  75     90      vin  0.0659  0.0501  0.1061  -131.5083  Sardinian  1108  1:22  data:vin=54%,cha=46%  57_estimates_with_logLike<3.4:vin=54%,cha=14%,v-c=32%
+90  75     90      vin  0.0659  0.0501  0.1259  -131.5083  Sardinian  1108  1:22  data:vin=49%,cha=51%  57_estimates_with_logLike<3.4:vin=54%,cha=14%,v-c=32%
+90  75     90      vin  0.0691  0.0604  0.1037  -131.7344  Karitiana  1108  1:22  data:vin=42%,cha=58%  57_estimates_with_logLike<3.4:vin=53%,cha=14%,v-c=33%
+
 ```
 
 By changing the source of contaminant there is some change for both split time (varing of 40%)  and contamination. To determine which is the better estimate, it is sufficient to compare the likelihoods since the estimates uses the same number of sequences. If you filter the data, and therefore generate a different input file, you should not compare the likelihood. 
