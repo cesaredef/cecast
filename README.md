@@ -1,5 +1,4 @@
-# _cecast_
-CoEstimating Contamination And Split Time
+# _cecast_: CoEstimating Contamination And Split Time
 
 The README.md file provides detailed instructions for using cecast, a maximum likelihood tool to estimate human contamination and split time in low-coverage archaic samples. It outlines the required scripts, necessary files, installation process, input generation, and execution steps. The document includes example workflows, explanations for different parameter options, and tips for interpreting the results.
 
