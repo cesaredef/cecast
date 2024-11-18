@@ -87,7 +87,7 @@ bam2cecast.py -s ${infosites} -l 30 -L 100 -IREF -m 25 -b 10 example.bam > examp
 bam2cecast.py -s ${infosites} -l 30 -L 100 -IREF -m 25 -b 10 -d 3,3 example.bam > example_iref_d3.tabs
 ```
 ### Description
-The resulting `*.tabs` files (inputs for `cecast`) contain lineage assignment tables divided into 10 Mb blocks (specified by -b). These blocks support bootstrapping and confidence interval for later calculations.
+The resulting `*.tabs` files (inputs for `cecast`) contain lineage assignment tables divided into 10 Mb blocks (specified by -b). These blocks support bootstrapping and confidence interval for later calculations. In the examples, there are only four blocks since the BAM file contains only 100,000 reads on chromosome 1. 
 
 ### Key Options:
   - `-I`: Removes reads with indels.
@@ -145,9 +145,11 @@ iref_d3  68  58     71      vin  0.2089  0.1829  0.2968  -110.7259  Yoruba    39
 It is surprising that when using deaminated reads, contamination is much higher than when using all reads. This is likely due to stochasticity of the small number of reads (<400). Notice the drastic effect of the strict strand filter (`-S` option in `bam2cecast.py`) on the number of sequences/reads, compared to the looser one (`-F` option in `bam2cecast.py`), which in this case does not affect much the estimates. Keep in mind that you cannot compare the likelihoods across these three examples, as they are highly dependent on the number of sequences: the higher the number of sites, the lower the likelihood.
 
 ### _cecast_ Key Options:
-   * `-p`: Source of human contamination (default: _Yoruba_). Other options include nine additional human samples.
-   * `-r`: Reference human sample (default: _Mbuti_) used for lineage assignment. _Yoruba_ is another option, but it may not yield reliable results if it is also used as the contamination source.
+   * `-p`: Source of human contamination (default: _Yoruba_). Other options include nine additional human samples. Example: `-p French` or `-p Fr` for French sample. 
+   * `-r`: Reference human sample (default: _Mbuti_) used for lineage assignment. _Yoruba_ is another option, but it may not yield reliable results if it is also used as the contamination source. Example: `-c y`. 
    * `-t`: Constraint on the split time range to save time (though the method is already fast). This should be done only after a first estimate to ensure the constraint is within plausible ranges. Example: `-t 70,100`.
+   * `-c`: Constraint on contamination as for split times (default: _0,1_). Esample: `-c 0,0.2`. 
+   * `-O`: Outputs all estimates and bootstraps if you want to look deeper at the results.   
 
  
 ### Example source of contamination.
@@ -175,7 +177,6 @@ column -t ${OUT}
 90  86     93      cha  0.0548  0.0333  0.0918  -139.7738  Karitiana  1454  1:22  data:vin=38%,cha=57%,v-c=5%   52_estimates_with_logLike<3.4:vin=46%,cha=15%,v-c=38%
 ```
 
-
-In this example, Papuan is the best source of contamination, but this is rather due to chance since there are only about 1500 reads. Furthermore, the log likelihoods are not that different. This is only one example, where I used just a few sequences to explain the proceduere, but I will show later on some examples where the source of contamination really matters. 
+In this example, Papuan emerges as the best source of contamination, likely due to chance, given that only ~1,500 reads are involved. The log-likelihood differences are minimal. This serves as a simplified illustration, using a limited dataset, to explain the procedure. More extensive examples with larger datasets will demonstrate scenarios where the choice of contamination source significantly impacts results.
 
  
