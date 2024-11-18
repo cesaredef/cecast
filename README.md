@@ -75,6 +75,8 @@ R < install.R --no-save
 ```
 During installation, a hidden JSON file (`~/.config_cecast.json`) is created in your home directory. To place it elsewhere, modify cecast.R accordingly. If reinstallation is needed, delete the existing JSON file to allow the process to reset.
 
+Keep in mind, that you might have to re-index the downloaded BED and BAM files, with `tabix` and `samtools` since the index file might be younger after the download. 
+
 ## Generate input
 This example demonstrates the cecast pipeline using 100,000 sequences from the Mezmaskaya1 Neanderthal BAM file, downloadable [here](https://bioinf.eva.mpg.de/SpAl/downloads/example.bam). 
 
