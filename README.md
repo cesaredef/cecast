@@ -1,6 +1,6 @@
 # _cecast_: CoEstimating Contamination And Split Time
 
-The README.md file provides detailed instructions for using cecast, a maximum likelihood tool to estimate human contamination and split time in low-coverage archaic samples. It outlines the required scripts, necessary files, installation process, input generation, and execution steps. The document includes example workflows, explanations for different parameter options, and tips for interpreting the results.
+The README.md file provides detailed instructions for using _cecast_, a maximum likelihood tool to estimate human contamination and split time in low-coverage archaic samples. It outlines the required scripts, necessary files, installation process, input generation, and execution steps. The document includes example workflows, explanations for different parameter options, and tips for interpreting the results.
 
 
 ## Table of contents
@@ -43,20 +43,20 @@ _cecast_ is a maximum likelihood tool designed to estimate human contamination a
    - This BED file (~9.9 million sites) contains informative positions required for generating input files, such as lineage assignments.
       ```bash
       zcat infosites_MYAVCD_manifesto_anc3out4CBGO_dist50bp_some_humans.bed.gz | head -n 10
-      1	754162	754163	C	T	CBGO_avcdmy	T	C	T	T	T	T	T	T	T	T
-      1	755211	755212	T	G	CBGO_avcdmy	G	G	G	G	G	G	G	?	G	G
-      1	755219	755220	G	A	CBGO_avcdmy	A	A	?	A	A	?	A	?	A	A
-      1	755238	755239	G	T	CBG_avcdmy	T	?	?	T	T	?	T	?	T	T
-      1	769885	769886	T	C	CBGO_avcdmy	?	C	C	?	C	C	?	C	C	?
-      1	776806	776807	G	A	CBGO_avcdmy	A	A	?	A	A	A	A	?	A	A
-      1	778112	778113	C	A	BGO_avcdmy	A	A	A	A	A	A	A	A	A	A
-      1	779452	779453	G	A	CGO_avcdmy	A	A	A	A	A	A	A	A	A	?
-      1	780033	780034	C	A	CGO_avcdmy	A	A	A	A	A	A	A	A	A	A
-      1	785502	785503	A	G	CBGO_avcdmy	G	G	G	A	G	G	G	G	G	G
+      #Chr  Start   End     Anc  Der  Atype_lin    Dai  Fre  Han  Man  Mbu  Pap  San  Sar  Yor  Kar
+      1     754162  754163  C    T    CBGO_avcdmy  T    C    T    T    T    T    T    T    T    T
+      1     755211  755212  T    G    CBGO_avcdmy  G    G    G    G    G    G    G    ?    G    G
+      1     755219  755220  G    A    CBGO_avcdmy  A    A    ?    A    A    ?    A    ?    A    A
+      1     755238  755239  G    T    CBG_avcdmy   T    ?    ?    T    T    ?    T    ?    T    T
+      1     769885  769886  T    C    CBGO_avcdmy  ?    C    C    ?    C    C    ?    C    C    ?
+      1     776806  776807  G    A    CBGO_avcdmy  A    A    ?    A    A    A    A    ?    A    A
+      1     778112  778113  C    A    BGO_avcdmy   A    A    A    A    A    A    A    A    A    A
+      1     779452  779453  G    A    CGO_avcdmy   A    A    A    A    A    A    A    A    A    ?
+      1     780033  780034  C    A    CGO_avcdmy   A    A    A    A    A    A    A    A    A    A
       ```
       - *Columns 1-3*: Chromosome, start, and end coordinates.
       - *Columns 4-5*: Ancestral and derived alleles.
-      - *Column 6*: Specifies the ancestry type and lineage.
+      - *Column 6*: Specifies the ancestry type and lineage. For example, *CBGO_avcdmy* means that Chimpanzee, Bonobo, Gorilla and Orangutan have the same ancestral allele, and that Altai, Vindija, Chagyrskaya, Denisova, Mbuti and Yoruba the derived allele. *BGO_acy* means that Bonobo, Gorilla and Orangutan have the same ancestral allele and Altai, Chagyrskaya, and Yoruba the eerived allele. 
       - *Remaining columns*: Represent alleles from 10 modern humans.   
    This structured format is essential for processing data and generating input files effectively.
 
