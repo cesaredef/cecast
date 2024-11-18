@@ -95,8 +95,8 @@ The resulting `*.tabs` files (inputs for `cecast`) contain lineage assignment ta
   - `-E`: Excludes reads neither ancestral nor derived (based on the _infosites_ file).
   - `-S`: Performs strand-specific orientation sampling. Use `-F` instead of `-S` for looser sampling. *Note*: These filters apply only to single-strand libraries.
   - `-m`: Sets the minimum mapping quality. Can be omitted if prefiltered for mappability by length using [_MapL_](https://bioinf.eva.mpg.de/MapL/), desfribed in [de Filippo et al. 2018](https://rdcu.be/d0vIf).
-  - `-d`: Filters deaminated reads based on terminal positions. For example, -d 3,3 considers reads with C-to-T changes in the last three positions at both ends. You can customize the terminal lengths, e.g., -d 2,4.
-  - `-l` and `-L`: Set the minimum and maximum read lengths, respectively. -L 100 is optional, as it’s the default.
+  - `-d`: Filters deaminated reads based on terminal positions. For example, `-d 3,3` considers reads with C-to-T changes in the last three positions at both ends. You can customize the terminal lengths, e.g., `-d 2,4`.
+  - `-l` and `-L`: Set the minimum and maximum read lengths, respectively. `-L 100` is optional, as it’s the default.
 
 ### Speeding Up the Process
 For repeated processing of the same BAM file, filter it to include only reads overlapping informative sites:
@@ -131,7 +131,7 @@ OUT=results.tsv
 INDECES='ires iref iref_d3'
 echo -e "#file\t$(cecast -H)" > ${OUT} # create the header of the output file
 for i in ${INDECES} ; do 
-   echo -e "${i}\t$(cecast data/example_${i}.tabs | sed 1d)"
+   echo -e "${i}\t$(cecast data/example_${i}.tabs | sed 1d)";
 done >> ${OUT}
 # Print the results
 column -t results.tsv
@@ -140,8 +140,14 @@ ires     90  84     90      cha  0.0681  0.0512  0.1512  -131.5273  Yoruba    11
 iref     90  84     101     cha  0.058   0.0418  0.136   -140.3437  Yoruba    1454  1:22  data:vin=29%,cha=67%,v-c=4%  50_estimates_with_logLike<3.4:vin=44%,cha=16%,v-c=40%
 iref_d3  68  58     71      vin  0.2089  0.1829  0.2968  -110.7259  Yoruba    397   1:22  data:vin=93%,cha=7%          73_estimates_with_logLike<3.4:vin=55%,cha=15%,v-c=30%
 ```
+
 #### Some explanations
 It is surprising that when using deaminated reads, contamination is much higher than when using all reads. This is likely due to stochasticity of the small number of reads (<400). Notice the drastic effect of the strict strand filter (`-S` option in `bam2cecast.py`) on the number of sequences/reads, compared to the looser one (`-F` option in `bam2cecast.py`), which in this case does not affect much the estimates. Keep in mind that you cannot compare the likelihoods across these three examples, as they are highly dependent on the number of sequences: the higher the number of sites, the lower the likelihood.
+
+### _cecast_ Key Options:
+   * `-p`: Source of human contamination (default: _Yoruba_). Other options include nine additional human samples.
+   * `-r`: Reference human sample (default: _Mbuti_) used for lineage assignment. _Yoruba_ is another option, but it may not yield reliable results if it is also used as the contamination source.
+   * `-t`: Constraint on the split time range to save time (though the method is already fast). This should be done only after a first estimate to ensure the constraint is within plausible ranges. Example: `-t 70,100`.
 
  
 ### Example source of contamination.
@@ -150,8 +156,10 @@ The following bash command loops over the different sources and stores the diffe
 ```bash
 OUT=results_c_source.tsv
 SAMPLES='Dai French Han Mandenka Mbuti Papuan San Sardinian Karitiana'
-./cecast.R data/example_L30MQ25_sf_loose.tabs > ${OUT}
-for s in ${SAMPLES} ; do ./cecast.R -p ${s} data/example_L30MQ25_sf_loose.tabs | sed 1d; done >> ${OUT}
+cecast data/example_iref.tabs > ${OUT}
+for s in ${SAMPLES};
+   do cecast -p ${s} data/example_iref.tabs | sed 1d;
+done >> ${OUT}
 
 column -t ${OUT}
 #t  t_low  t_high  pop  c       c_low   c_high  logLike    c_source   nseq  chr   boot                          comments
@@ -167,11 +175,7 @@ column -t ${OUT}
 90  86     93      cha  0.0548  0.0333  0.0918  -139.7738  Karitiana  1454  1:22  data:vin=38%,cha=57%,v-c=5%   52_estimates_with_logLike<3.4:vin=46%,cha=15%,v-c=38%
 ```
 
-### _cecast_ Key Options:
-   * `-p`: Source of human contamination (default: _Yoruba_). Other options include nine additional human samples.
-   * `-r`: Reference human sample (default: _Mbuti_) used for lineage assignment. _Yoruba_ is another option, but it may not yield reliable results if it is also used as the contamination source.
-   * `-t`: Constraint on the split time range to save time (though the method is already fast). This should be done only after a first estimate to ensure the constraint is within plausible ranges. Example: `-t 70,100`.
 
 In this example, Papuan is the best source of contamination, but this is rather due to chance since there are only about 1500 reads. Furthermore, the log likelihoods are not that different. This is only one example, where I used just a few sequences to explain the proceduere, but I will show later on some examples where the source of contamination really matters. 
 
-Notice instead that  
+ 
