@@ -150,6 +150,7 @@ It is surprising that when using deaminated reads, contamination is much higher 
    * `-r`: Reference human sample (default: _Mbuti_) used for lineage assignment. _Yoruba_ is another option, but it may not yield reliable results if it is also used as the contamination source. Example: `-c y`. 
    * `-t`: Constraint on the split time range to save time (though the method is already fast). This should be done only after a first estimate to ensure the constraint is within plausible ranges. Example: `-t 70,100`.
    * `-c`: Constraint on contamination as for split times (default: _0,1_). Esample: `-c 0,0.2`. 
+   * `-o`: Type of outgroup used to determined ancestry (default: use at least 3 out of 4 outgroup genomes). To be more strict and confindent on the ancestry, specify `-o CBGO` but this reduce the amount of sites (by ~17% in the examples above). 
    * `-O`: Outputs all estimates and bootstraps if you want to look deeper at the results.   
 
  
