@@ -184,7 +184,7 @@ column -t ${OUT}
 90  86     93      cha  0.0548  0.0333  0.0918  -139.7738  Karitiana  1454  1:22  data:vin=38%,cha=57%,v-c=5%   52_estimates_with_logLike<3.4:vin=46%,cha=15%,v-c=38%
 ```
 
-First, notice that using the same sample, Yoruba, as both the reference and source of contamination typically results in a lower contamination estimate. This is not the case for Mbuti because the sample used for the reference is different from that used for the source of contamination. This is not the case for Mbuti, where the reference and source samples are different. In this example (excluding the mentioned Yoruba estimate), Papuan emerges as the best source of contamination, likely due to chance given the limited dataset (only ~1,500 reads). While log-likelihood differences are minimal, larger datasets will better demonstrate the impact of contamination source selection. This serves as a simplified illustration to explain the procedure.
+First, notice that using the same sample, Yoruba, as both the reference and source of contamination typically results in a lower contamination estimate. This is not the case for Mbuti, where the reference and source samples are different. In this example (excluding the mentioned Yoruba estimate), Papuan emerges as the best source of contamination, likely due to chance given the limited dataset (only ~1,500 reads). While log-likelihood differences are minimal, larger datasets will better demonstrate the impact of contamination source selection. This serves as a simplified illustration to explain the procedure.
 
 
  
