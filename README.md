@@ -19,13 +19,15 @@ _cecast_ is a maximum likelihood tool designed to estimate human contamination a
 
 ## Necessary scripts
 
-- **`bam2cecast.py`**: Prepares input files from BAM files and can generate pileups with various options at informative sites. It requires some standard Python3 libraries (specified within the script). This script also includes additional useful functions.
+- **`bam2cecast.py`**: A script that processes BAM files to prepare input files for downstream analysis, including generating pileups at informative sites. It supports a range of options and features useful functions for filtering and formatting data. Dependencies include Python3 standard modules (requiring no additional installation) such as `os`, `copy`, `random`, `itertools`, `signal`, `os.path`, `argparse`, and `textwrap` and the package `pysam`. Ensure all required packages are installed for optimal functionality.
 
-- **`vcf2cecast.py`**: (Optional) Prepares input files from VCF files and performs other auxiliary tasks.
+- **`vcf2cecast.py`**: (Optional) Prepares input files from VCF files and performs other auxiliary tasks. 
 
 - **`cecast.R`**: Executes the estimation process using R. 
 
 - **`install.R`**: Installs necessary R packages and ensures all files are properly loaded when running `cecast.R`.
+
+
 
 ## Other necessary files 
 
@@ -54,7 +56,7 @@ _cecast_ is a maximum likelihood tool designed to estimate human contamination a
       1     779452  779453  G    A    CGO_avcdmy   A    A    A    A    A    A    A    A    A    ?
       1     780033  780034  C    A    CGO_avcdmy   A    A    A    A    A    A    A    A    A    A
       ```
-      - *Columns 1-3*: Chromosome, start, and end coordinates.
+      - *Columns 1-3*: Chromosome, start, and end coordinates for hg19/GCRh37.
       - *Columns 4-5*: Ancestral and derived alleles.
       - *Column 6*: Specifies the ancestry type and lineage. For example, *CBGO_avcdmy* means that Chimpanzee, Bonobo, Gorilla and Orangutan have the same ancestral allele, and that Altai, Vindija, Chagyrskaya, Denisova, Mbuti and Yoruba are all derived. *BGO_acy* means that Bonobo, Gorilla and Orangutan have the same ancestral allele and Altai, Chagyrskaya, and Yoruba the derived allele. 
       - *Remaining columns*: Represent alleles from 10 modern humans.   
@@ -77,7 +79,7 @@ During installation, a hidden JSON file (`~/.config_cecast.json`) is created in 
 Keep in mind, that you might have to re-index the downloaded BED and BAM files, with `tabix` and `samtools` since the index file might be younger after the download. 
 
 ## Generate input
-This example demonstrates the cecast pipeline using 100,000 sequences from the Mezmaskaya1 Neanderthal BAM file, downloadable [here](https://bioinf.eva.mpg.de/SpAl/downloads/example.bam). 
+This example demonstrates the _cecast_ pipeline using 100,000 sequences from the Mezmaskaya1 Neanderthal BAM file, downloadable [here](https://bioinf.eva.mpg.de/SpAl/downloads/example.bam). 
 
 ```bash
 cd data
