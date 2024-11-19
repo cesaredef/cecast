@@ -94,7 +94,9 @@ The resulting `*.tabs` files (inputs for `cecast`) contain lineage assignment ta
   - `-I`: Removes reads with indels.
   - `-R`: Randomly samples one read per site.
   - `-E`: Excludes reads neither ancestral nor derived (based on the _infosites_ file).
-  - `-S`: Performs strand-specific orientation sampling. Use `-F` instead of `-S` for looser sampling. *Note*: These filters apply only to single-strand libraries.
+  - `-S`: Performs strand-specific orientation sampling. In datail, samples sequences in reverse orientation at C variable sites and sequences in forward orientation at G sites.
+  - `-F`: Performs a less srtingent strand-specific orientation sampling. In detail, sample sequences in reverse and forward oriantation at C/T and G/A variable sites, respectively.  
+  *Note*: These filters apply only to single-strand libraries.
   - `-m`: Sets the minimum mapping quality. Can be omitted if prefiltered for mappability by length using [_MapL_](https://bioinf.eva.mpg.de/MapL/), desfribed in [de Filippo et al. 2018](https://rdcu.be/d0vIf).
   - `-d`: Filters deaminated reads based on terminal positions. For example, `-d 3,3` considers reads with C-to-T changes in the last three positions at both ends. You can customize the terminal lengths, e.g., `-d 2,4`.
   - `-l` and `-L`: Set the minimum and maximum read lengths, respectively. `-L 100` is optional, as it’s the default.
@@ -147,7 +149,7 @@ It is surprising that when using deaminated reads, contamination is much higher 
 
 ### _cecast_ Key Options:
    * `-p`: Source of human contamination (default: _Yoruba_). Other options include nine additional human samples. Example: `-p French` or `-p Fr` for French sample. 
-   * `-r`: Reference human sample (default: _Mbuti_) used for lineage assignment. _Yoruba_ is another option, but it may not yield reliable results if it is also used as the contamination source. Example: `-c y`. 
+   * `-r`: Reference human sample (default: _Mbuti_) used for lineage assignment. _Yoruba_ is another option, but it may not yield reliable results if it is also used as the contamination source. Example: `-r y`. 
    * `-t`: Constraint on the split time range to save time (though the method is already fast). This should be done only after a first estimate to ensure the constraint is within plausible ranges. Example: `-t 70,100`.
    * `-c`: Constraint on contamination as for split times (default: _0,1_). Esample: `-c 0,0.2`. 
    * `-o`: Type of outgroup used to determined ancestry (default: use at least 3 out of 4 outgroup genomes). To be more strict and confindent on the ancestry, specify `-o CBGO` but this reduce the amount of sites (by ~17% in the examples above). 
@@ -162,7 +164,7 @@ OUT=results_c_source.tsv
 SAMPLES='Yoruba Dai French Han Mandenka Mbuti Papuan San Sardinian Karitiana'
 # Use Yoruba as reference and source of contamination
 cecast -r y data/example_iref.tabs > ${OUT}
-# Loop over the difference sources with Mbuti (default) as reference used in the lineage assignment.
+# Loop over the different sources with Mbuti (default) as reference used in the lineage assignment.
 for s in ${SAMPLES};
    do cecast -p ${s} data/example_iref.tabs | sed 1d;
 done >> ${OUT}
