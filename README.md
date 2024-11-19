@@ -40,7 +40,7 @@ _cecast_ is a maximum likelihood tool designed to estimate human contamination a
 - **`expected_counts_fine_grid_archaics_var.RData`**: Expectations using SNPs captured based on variations found in Archaics.
 
 - **`infosites_MYAVCD_manifesto_anc3out4CBGO_dist50bp_some_humans.bed.gz`**: A BED file containing informative sites and necessary details to create input files for cecast. Ensure the file is indexed with `<tabix -p bed infosites*.gz>` before running the `bam2cecast.py`.
-   - This BED file (~9.9 million sites) contains informative positions required for generating input files, such as lineage assignments.
+   - This BED file (~9.9 million sites) contains informative positions required for generating input files, such as lineage assignments. This structured format is essential for processing data and generating input files effectively.
       ```bash
       zcat infosites_MYAVCD_manifesto_anc3out4CBGO_dist50bp_some_humans.bed.gz | head -n 10
       #Chr  Start   End     Anc  Der  Atype_lin    Dai  Fre  Han  Man  Mbu  Pap  San  Sar  Yor  Kar
@@ -56,9 +56,8 @@ _cecast_ is a maximum likelihood tool designed to estimate human contamination a
       ```
       - *Columns 1-3*: Chromosome, start, and end coordinates.
       - *Columns 4-5*: Ancestral and derived alleles.
-      - *Column 6*: Specifies the ancestry type and lineage. For example, *CBGO_avcdmy* means that Chimpanzee, Bonobo, Gorilla and Orangutan have the same ancestral allele, and that Altai, Vindija, Chagyrskaya, Denisova, Mbuti and Yoruba the derived allele. *BGO_acy* means that Bonobo, Gorilla and Orangutan have the same ancestral allele and Altai, Chagyrskaya, and Yoruba the eerived allele. 
+      - *Column 6*: Specifies the ancestry type and lineage. For example, *CBGO_avcdmy* means that Chimpanzee, Bonobo, Gorilla and Orangutan have the same ancestral allele, and that Altai, Vindija, Chagyrskaya, Denisova, Mbuti and Yoruba are all derived. *BGO_acy* means that Bonobo, Gorilla and Orangutan have the same ancestral allele and Altai, Chagyrskaya, and Yoruba the derived allele. 
       - *Remaining columns*: Represent alleles from 10 modern humans.   
-   This structured format is essential for processing data and generating input files effectively.
 
 
 ## Installation
@@ -87,6 +86,7 @@ bam2cecast.py -s ${infosites} -l 30 -L 100 -IRES -m 25 -b 10 example.bam > examp
 bam2cecast.py -s ${infosites} -l 30 -L 100 -IREF -m 25 -b 10 example.bam > example_iref.tabs
 bam2cecast.py -s ${infosites} -l 30 -L 100 -IREF -m 25 -b 10 -d 3,3 example.bam > example_iref_d3.tabs
 ```
+
 ### Description
 The resulting `*.tabs` files (inputs for `cecast`) contain lineage assignment tables divided into 10 Mb blocks (specified by -b). These blocks support bootstrapping and confidence interval for later calculations. In the examples, there are only four blocks since the BAM file contains only 100,000 reads on chromosome 1. 
 
