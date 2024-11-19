@@ -155,18 +155,20 @@ It is surprising that when using deaminated reads, contamination is much higher 
 
  
 ### Example source of contamination.
-The following bash command loops over the different sources and stores the different estimates (more comprehensible) in `results_c_source.tsv`:
+The following bash command loops over the different sources and stores the different estimates (in a more comprehensible format) in `results_c_source.tsv`. Before running the loop, I execute the estimate using Yoruba as both the reference (`-r y`) and the source of contamination, which corresponds to the same individual.
 
 ```bash
 OUT=results_c_source.tsv
-SAMPLES='Dai French Han Mandenka Mbuti Papuan San Sardinian Karitiana'
-cecast data/example_iref.tabs > ${OUT}
+SAMPLES='Yoruba Dai French Han Mandenka Mbuti Papuan San Sardinian Karitiana'
+# Use Yoruba as reference and source of contamination
+cecast -r y data/example_iref.tabs > ${OUT}
 for s in ${SAMPLES};
    do cecast -p ${s} data/example_iref.tabs | sed 1d;
 done >> ${OUT}
 
 column -t ${OUT}
 #t  t_low  t_high  pop  c       c_low   c_high  logLike    c_source   nseq  chr   boot                          comments
+93  86     106     v-c  0.0305  0.0235  0.0503  -131.4266  Yoruba     1424  1:22  data
 90  88     101     vin  0.0529  0.0385  0.0817  -139.6876  Yoruba     1454  1:22  data:vin=56%,cha=34%,v-c=10%  51_estimates_with_logLike<3.4:vin=47%,cha=14%,v-c=39%
 90  86     91      cha  0.0547  0.0292  0.1116  -139.6168  Dai        1454  1:22  data:vin=36%,cha=62%,v-c=2%   52_estimates_with_logLike<3.4:vin=46%,cha=15%,v-c=38%
 90  84     99      vin  0.0529  0.0398  0.0868  -139.5285  French     1454  1:22  data:vin=45%,cha=44%,v-c=11%  52_estimates_with_logLike<3.4:vin=46%,cha=15%,v-c=38%
@@ -179,6 +181,7 @@ column -t ${OUT}
 90  86     93      cha  0.0548  0.0333  0.0918  -139.7738  Karitiana  1454  1:22  data:vin=38%,cha=57%,v-c=5%   52_estimates_with_logLike<3.4:vin=46%,cha=15%,v-c=38%
 ```
 
-In this example, Papuan emerges as the best source of contamination, likely due to chance, given that only ~1,500 reads are involved. The log-likelihood differences are minimal. This serves as a simplified illustration, using a limited dataset, to explain the procedure. More extensive examples with larger datasets will demonstrate scenarios where the choice of contamination source significantly impacts results.
+First, notice that using the same sample, Yoruba, as both the reference and source of contamination typically results in a lower contamination estimate. This is not the case for Mbuti because the sample used for the reference is different from that used for the source of containation. This is not the case for Mbuti, where the reference and source samples are different. In this example (excluding the mentioned Yoruba estimate), Papuan emerges as the best source of contamination, likely due to chance given the limited dataset (only ~1,500 reads). While log-likelihood differences are minimal, larger datasets will better demonstrate the impact of contamination source selection. This serves as a simplified illustration to explain the procedure.
+
 
  
