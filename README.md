@@ -94,12 +94,12 @@ The resulting `*.tabs` files (inputs for `cecast`) contain lineage assignment ta
   - `-I`: Removes reads with indels.
   - `-R`: Randomly samples one read per site.
   - `-E`: Excludes reads neither ancestral nor derived (based on the _infosites_ file).
-  - `-S`: Performs strand-specific orientation sampling. In datail, samples sequences in reverse orientation at C variable sites and sequences in forward orientation at G sites.
-  - `-F`: Performs a less srtingent strand-specific orientation sampling. In detail, sample sequences in reverse and forward oriantation at C/T and G/A variable sites, respectively.  
-  *Note*: These filters apply only to single-strand libraries.
+  - `-S`: Performs strand-specific orientation sampling: selects reverse-oriented sequences at C-variable sites and forward-oriented sequences at G-variable sites. 
+  - `-F`: Applies a less stringent strand-specific sampling: selects reverse and forward orientations at C/T and G/A variable sites, respectively.  
+  **Note**: `-S` and `-F` are for single-strand libraries only.
   - `-m`: Sets the minimum mapping quality. Can be omitted if prefiltered for mappability by length using [_MapL_](https://bioinf.eva.mpg.de/MapL/), desfribed in [de Filippo et al. 2018](https://rdcu.be/d0vIf).
-  - `-d`: Filters deaminated reads based on terminal positions. For example, `-d 3,3` considers reads with C-to-T changes in the last three positions at both ends. You can customize the terminal lengths, e.g., `-d 2,4`.
-  - `-l` and `-L`: Set the minimum and maximum read lengths, respectively. `-L 100` is optional, as it’s the default.
+  - `-d`: Select deaminated reads based on terminal positions (e.g., `-d 3,3` considers reads with C-to-T changes in the last three positions of both ends).
+  - `-l`/`-L`: Set the minimum/maximum read lengths (`-L 100` is the default).
 
 ### Speeding Up the Process
 For repeated processing of the same BAM file, filter it to include only reads overlapping informative sites:
