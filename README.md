@@ -115,7 +115,7 @@ Run _cecast_ with default paramters:
 ```bash
 cecast data/example_ires.tabs | column -t
 #t  t_low  t_high  pop  c       c_low   c_high  logLike    c_source  nseq  chr   boot                  comments
-90  75     90      vin  0.0664  0.0498  0.0952  -131.5178  Yoruba    1108  1:22  data:vin=54%,cha=46%  57_estimates_with_logLike<3.4:vin=54%,cha=14%,v-c=32%
+90  84     90      cha  0.0692  0.0552  0.1158  -119.4305  Mbuti     1066  1:22  data:vin=37%,cha=63%  56_estimates_with_logLike<3.4:vin=54%,cha=14%,v-c=32%
 ```
 
 ### Output description
@@ -123,7 +123,7 @@ cecast data/example_ires.tabs | column -t
 * _**pop**_: The lineage or population from which the test sample splits.
 * _**c**_, _**c_low**_ and _**c_up**_: Estimate, lower and upper intervals of human contamination.
 * _**logLike**_: Logarithm of the maximum likelihood values (point estimate).
-* _**c_source**_: Source of contamination (specified by the `-p` option, Yoruba as default). 
+* _**c_source**_: Source of contamination (specified by the `-p` option, Mbuti as default). 
 * _**nseq**_: Number of sequences/reads. 
 * _**chr**_: Chromosome(s) used. 
 * _**boot**_: Type of bootstrap (`-b` option), representing uncertainity from data (as default), history or both. Also reports the fraction of bootstraps supporting different split populations.
@@ -140,18 +140,18 @@ for i in ${INDECES} ; do
 done >> ${OUT}
 # Print the results
 column -t results.tsv
-#file    t   t_low  t_high  pop  c       c_low   c_high  logLike    c_source  nseq  chr   boot                         comments
-ires     90  84     90      cha  0.0681  0.0512  0.1512  -131.5273  Yoruba    1108  1:22  data:vin=45%,cha=55%         55_estimates_with_logLike<3.4:vin=51%,cha=15%,v-c=35%
-iref     90  84     101     cha  0.058   0.0418  0.136   -140.3437  Yoruba    1454  1:22  data:vin=29%,cha=67%,v-c=4%  50_estimates_with_logLike<3.4:vin=44%,cha=16%,v-c=40%
-iref_d3  68  58     71      vin  0.2089  0.1829  0.2968  -110.7259  Yoruba    397   1:22  data:vin=93%,cha=7%          73_estimates_with_logLike<3.4:vin=55%,cha=15%,v-c=30%
+#file    t   t_low  t_high  pop  c       c_low   c_high  logLike    c_source  nseq  chr   boot                          comments
+ires     90  84     90      cha  0.0692  0.0527  0.1278  -119.4305  Mbuti     1066  1:22  data:vin=42%,cha=58%          56_estimates_with_logLike<3.4:vin=54%,cha=14%,v-c=32%
+iref     90  86     100     cha  0.0523  0.0346  0.0844  -129.0306  Mbuti     1424  1:22  data:vin=12%,cha=71%,v-c=17%  50_estimates_with_logLike<3.4:vin=44%,cha=16%,v-c=40%
+iref_d3  68  56     77      vin  0.199   0.1891  0.2663  -108.4103  Mbuti     382   1:22  data:vin=93%,cha=7%           74_estimates_with_logLike<3.4:vin=54%,cha=15%,v-c=31%
 ```
 
 #### Some explanations
 It is surprising that when using deaminated reads, contamination is much higher than when using all reads. This is likely due to stochasticity of the small number of reads (<400). Notice the drastic effect of the strict strand filter (`-S` option in `bam2cecast.py`) on the number of sequences/reads, compared to the looser one (`-F` option in `bam2cecast.py`), which in this case does not affect much the estimates. Keep in mind that you cannot compare the likelihoods across these three examples, as they are highly dependent on the number of sequences: the higher the number of sites, the lower the likelihood.
 
 ### _cecast_ Key Options:
-   * `-p`: Source of human contamination (default: _Yoruba_). Other options include nine additional human samples. Example: `-p French` or `-p Fr` for French sample. 
-   * `-r`: Reference human sample (default: _Mbuti_) used for lineage assignment. _Yoruba_ is another option, but it may not yield reliable results if it is also used as the contamination source. Example: `-r y`. 
+   * `-p`: Source of human contamination (default: _Mbuti_). Other options include nine additional human samples. Example: `-p French` or `-p Fr` for French sample. 
+   * `-r`: Reference human sample (default: _Yoruba_) used for lineage assignment. _Mbuti_ is another option, but it may not yield reliable results if it is also used as the contamination source. Example: `-r m`. 
    * `-t`: Constraint on the split time range to save time (though the method is already fast). This should be done only after a first estimate to ensure the constraint is within plausible ranges. Example: `-t 70,100`.
    * `-c`: Constraint on contamination as for split times (default: _0,1_). Esample: `-c 0,0.2`. 
    * `-o`: Type of outgroup used to determined ancestry (default: use at least 3 out of 4 outgroup genomes). To be more strict and confindent on the ancestry, specify `-o CBGO` but this reduce the amount of sites (by ~17% in the examples above). 
@@ -163,30 +163,95 @@ The following bash command loops over the different sources and stores the diffe
 
 ```bash
 OUT=results_c_source.tsv
-SAMPLES='Yoruba Dai French Han Mandenka Mbuti Papuan San Sardinian Karitiana'
-# Use Yoruba as reference and source of contamination
-cecast -r y data/example_iref.tabs > ${OUT}
-# Loop over the different sources with Mbuti (default) as reference used in the lineage assignment.
+# Change the reference to Mbuti since Yoruba is the contamination source
+cecast -p Yoruba -r m data/example_iref.tabs > ${OUT}
+SAMPLES='Mbuti Dai French Han Mandenka Papuan San Sardinian Karitiana'
+# Loop over the different sources with Yoruba (default) as reference used in the lineage assignment.
 for s in ${SAMPLES};
    do cecast -p ${s} data/example_iref.tabs | sed 1d;
 done >> ${OUT}
+# Print the results
+
 
 column -t ${OUT}
 #t  t_low  t_high  pop  c       c_low   c_high  logLike    c_source   nseq  chr   boot                          comments
-93  86     106     v-c  0.0305  0.0235  0.0503  -131.4266  Yoruba     1424  1:22  data
-90  88     101     vin  0.0529  0.0385  0.0817  -139.6876  Yoruba     1454  1:22  data:vin=56%,cha=34%,v-c=10%  51_estimates_with_logLike<3.4:vin=47%,cha=14%,v-c=39%
-90  86     91      cha  0.0547  0.0292  0.1116  -139.6168  Dai        1454  1:22  data:vin=36%,cha=62%,v-c=2%   52_estimates_with_logLike<3.4:vin=46%,cha=15%,v-c=38%
-90  84     99      vin  0.0529  0.0398  0.0868  -139.5285  French     1454  1:22  data:vin=45%,cha=44%,v-c=11%  52_estimates_with_logLike<3.4:vin=46%,cha=15%,v-c=38%
-90  88     93      vin  0.0548  0.04    0.0862  -139.5552  Han        1454  1:22  data:vin=33%,cha=65%,v-c=2%   52_estimates_with_logLike<3.4:vin=46%,cha=15%,v-c=38%
-90  81     98      vin  0.0537  0.0395  0.0883  -139.4142  Mandenka   1454  1:22  data:vin=50%,cha=38%,v-c=12%  52_estimates_with_logLike<3.4:vin=46%,cha=15%,v-c=38%
-90  85     101     vin  0.0452  0.0313  0.0808  -140.6318  Mbuti      1454  1:22  data:vin=49%,cha=38%,v-c=13%  52_estimates_with_logLike<3.4:vin=46%,cha=13%,v-c=40%
-90  86     93      cha  0.0593  0.0316  0.1165  -139.0503  Papuan     1454  1:22  data:vin=40%,cha=57%,v-c=3%   52_estimates_with_logLike<3.4:vin=46%,cha=15%,v-c=38%
-90  81     93      vin  0.0527  0.0393  0.0701  -139.5258  San        1454  1:22  data:vin=48%,cha=45%,v-c=7%   52_estimates_with_logLike<3.4:vin=46%,cha=15%,v-c=38%
-90  81     93      vin  0.0538  0.0407  0.0899  -139.3427  Sardinian  1454  1:22  data:vin=50%,cha=41%,v-c=9%   52_estimates_with_logLike<3.4:vin=46%,cha=15%,v-c=38%
-90  86     93      cha  0.0548  0.0333  0.0918  -139.7738  Karitiana  1454  1:22  data:vin=38%,cha=57%,v-c=5%   52_estimates_with_logLike<3.4:vin=46%,cha=15%,v-c=38%
+90  84     101     cha  0.058   0.0367  0.1223  -140.3437  Yoruba     1454  1:22  data:vin=34%,cha=60%,v-c=6%   50_estimates_with_logLike<3.4:vin=44%,cha=16%,v-c=40%
+90  86     101     cha  0.0523  0.0358  0.074   -129.0306  Mbuti      1424  1:22  data:vin=22%,cha=61%,v-c=17%  50_estimates_with_logLike<3.4:vin=44%,cha=16%,v-c=40%
+90  84     101     cha  0.0522  0.0413  0.0928  -129.2257  Dai        1424  1:22  data:vin=14%,cha=71%,v-c=15%  50_estimates_with_logLike<3.4:vin=42%,cha=16%,v-c=42%
+90  86     101     cha  0.0525  0.0398  0.0789  -128.9354  French     1424  1:22  data:vin=11%,cha=71%,v-c=18%  50_estimates_with_logLike<3.4:vin=42%,cha=16%,v-c=42%
+90  86     101     cha  0.0525  0.0372  0.0955  -129.0684  Han        1424  1:22  data:vin=7%,cha=78%,v-c=15%   49_estimates_with_logLike<3.4:vin=43%,cha=16%,v-c=41%
+90  86     101     cha  0.0521  0.0381  0.0687  -128.9366  Mandenka   1424  1:22  data:vin=13%,cha=75%,v-c=12%  49_estimates_with_logLike<3.4:vin=43%,cha=16%,v-c=41%
+90  86     101     cha  0.0546  0.0353  0.0879  -128.9745  Papuan     1424  1:22  data:vin=14%,cha=73%,v-c=13%  49_estimates_with_logLike<3.4:vin=43%,cha=16%,v-c=41%
+90  86     93      cha  0.0546  0.0376  0.079   -128.9185  San        1424  1:22  data:vin=22%,cha=72%,v-c=6%   51_estimates_with_logLike<3.4:vin=45%,cha=16%,v-c=39%
+90  84     101     cha  0.0518  0.0348  0.0887  -128.9004  Sardinian  1424  1:22  data:vin=11%,cha=76%,v-c=13%  50_estimates_with_logLike<3.4:vin=44%,cha=16%,v-c=40%
+90  86     101     cha  0.0525  0.0364  0.0931  -129.2951  Karitiana  1424  1:22  data:vin=17%,cha=68%,v-c=15%  50_estimates_with_logLike<3.4:vin=42%,cha=16%,v-c=42%
 ```
 
-First, notice that using the same sample, Yoruba, as both the reference and source of contamination typically results in a lower contamination estimate. This is not the case for Mbuti, where the reference and source samples are different. In this example (excluding the mentioned Yoruba estimate), Papuan emerges as the best source of contamination, likely due to chance given the limited dataset (only ~1,500 reads). While log-likelihood differences are minimal, larger datasets will better demonstrate the impact of contamination source selection. This serves as a simplified illustration to explain the procedure.
+First, note that when using Yoruba as the source of contamination and Mbuti as the reference population (first row), the number of reads (column **nseq**) differs from the other estimates. As a result, the likelihoods are not directly comparable. Excluding this Yoruba estimate, Sardinian appears to be the best source of contamination. However, this result could be due to chance, given the limited dataset (~1,500 reads). While the log-likelihood differences are small, larger datasets would more clearly illustrate the effect of the contamination source selection. This example serves as a simplified demonstration of the procedure.
 
 
- 
+#### Effect of using the same sample as reference and source of contamination.
+The following command generates estimates using the same population as both the reference and contamination source, specifically Yoruba and Mbuti, which are currently the only samples used as references for lineage assignment.
+
+```bash
+OUT=results_c_source_ref.tsv
+echo -e "#Ref\t$(cecast -H)" > ${OUT}
+# Mbuti as reference and source of contamination
+echo -e "Mbuti\t$(cecast -r m data/example_iref.tabs | sed 1d)" >> ${OUT}
+# Mbuti as reference and Yoruba as source of contamination
+echo -e "Mbuti\t$(cecast -r m -p Yoruba data/example_iref.tabs | sed 1d)" >> ${OUT}
+# Yoruba as reference and source of contamination
+echo -e "Yoruba\t$(cecast -p Yoruba data/example_iref.tabs | sed 1d)" >> ${OUT}
+# Yoruba as reference and Mbuti as source of contamination
+echo -e "Yoruba\t$(cecast -r y -p Mbuti data/example_iref.tabs | sed 1d)" >> ${OUT}
+
+column -t ${OUT}
+#Ref    t   t_low  t_high  pop  c       c_low   c_high  logLike    c_source  nseq  chr   boot                         comments
+Mbuti   90  86     101     cha  0.0499  0.0315  0.0808  -141.2587  Mbuti     1454  1:22  data:vin=26%,cha=70%,v-c=4%  50_estimates_with_logLike<3.4:vin=42%,cha=16%,v-c=42%
+Yoruba  93  86     103     v-c  0.0305  0.024   0.0522  -131.4266  Yoruba    1424  1:22  data
+```
+
+Using the same sample as both the reference and the contamination source typically results in a lower contamination estimate. However, this is not entirely the case for Mbuti, where the contamination estimate is only 5% lower. This occurs because the reference and contamination samples, while from the same population, are not identical. In contrast, using Yoruba results in almost half the contamination estimate (0.030 vs. 0.058) since the same individual is used for both the reference and contamination source. Keep this in mind when using the `-p` and `-r` options. 
+
+
+### Examples with more sequences from Mezmaskaya 1
+The following examples use the same sample Mezmaskaya but with many more reads using this input `data/mez1_L34MQ1_iref.tabs`. This has been generated with `bam2cecast.py` using a much bigger BAM file, which I omitted from this repository for size reason. 
+
+#### Less contamination when selecting for deaminated sequences
+In the example before, selecting for deaminated sequences using `the example.bam` resulted in more contamination, but this is not the case when using much more data, as our expecations of aDNA. 
+
+```bash
+cat <(cecast data/mez1_iref.tabs ) <(cecast data/mez1_iref_d3.tabs | sed 1d) | column -t
+#t  t_low  t_high  pop  c       c_low   c_high  logLike     c_source  nseq    chr   boot  comments
+93  86     93      v-c  0.0233  0.0219  0.0261  -1423.9877  Mbuti     300897  1:22  data
+93  85     93      v-c  0.0046  0.0028  0.0078  -690.9816   Mbuti     92120   1:22  data
+```
+
+#### Compare the likelihoods
+The following bash command does the same as before with different contamination sources. 
+
+```bash
+OUT=results_c_source_mez1.tsv
+# For Yoruba as source of contamination change the reference to Mbuti since Yoruba is the default reference.
+cecast -p Yoruba -r m data/mez1_iref.tabs > ${OUT}
+# Loop for the other sources
+SAMPLES='Mbuti Dai French Han Mandenka Papuan San Sardinian Karitiana'
+for s in ${SAMPLES};
+   do cecast -p ${s} data/mez1_iref.tabs | sed 1d;
+done >> ${OUT}
+
+column -t ${OUT}
+#t  t_low  t_high  pop  c       c_low   c_high  logLike     c_source   nseq    chr   boot  comments
+93  86     93      v-c  0.0223  0.0205  0.0245  -1793.7847  Yoruba     305005  1:22  data
+93  88     93      v-c  0.0233  0.0218  0.0261  -1423.9877  Mbuti      300897  1:22  data
+93  88     93      v-c  0.0223  0.021   0.0248  -1425.9039  Dai        300897  1:22  data
+93  88     93      v-c  0.0224  0.0208  0.0253  -1425.5827  French     300897  1:22  data
+93  86     93      v-c  0.0225  0.0208  0.0248  -1425.3675  Han        300897  1:22  data
+93  88     93      v-c  0.0215  0.0201  0.024   -1428.7057  Mandenka   300897  1:22  data
+93  88     93      v-c  0.0228  0.0212  0.0254  -1423.2131  Papuan     300897  1:22  data
+93  85     93      v-c  0.0245  0.0234  0.0278  -1423.8176  San        300897  1:22  data
+93  86     93      v-c  0.0223  0.021   0.0252  -1426.1349  Sardinian  300897  1:22  data
+93  86     93      v-c  0.0225  0.0207  0.0251  -1425.4836  Karitiana  300897  1:22  data
+```
+
+
