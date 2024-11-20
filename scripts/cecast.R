@@ -38,7 +38,7 @@ parser$add_argument("-p", dest="population",
 help="Human population as source of contaminantion. Default is Mbuti, and the ohers are: Dai, French, Han, Mandenka, Papuan, San, Sardinian, Yoruba, Karitiana", default="Mbuti", type="character")
 
 parser$add_argument("-r", dest="human_reference",
-help="The human sample to be used: y for Yoruba (default) and m for Mbuti. Notice that Yoruba is the same individual as the one for source of contamination, while the Mbuti is a differenct individual. Therefore, another individual should be specified with -p. ", default="m", type="character")
+help="The human sample to be used: y for Yoruba (default) and m for Mbuti. Notice that Yoruba is the same individual as the one for source of contamination, while the Mbuti is a differenct individual. Therefore, another individual should be specified with -p. ", default="y", type="character")
 
 parser$add_argument("-e", dest="exclude_class",
 help="Remove a given class of sites (lineages) for the analyses. Use the commas to separate the different classes.", type="character")
