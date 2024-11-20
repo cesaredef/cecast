@@ -192,11 +192,11 @@ if(sum(!is.null(argv$population) & nchar(argv$population) > 2) == 1) {
 		argv$population = NULL
 		c_source = "simulation"
 	} else {
-		perfect_match <- c_source <- human_sources[toupper(human_sources) == toupper(argv$population)]
+		perfect_match <- human_sources[toupper(human_sources) == toupper(argv$population)]
 		if(length(perfect_match) == 0) {
 			best_match <- seq_match(argv$population, human_sources)
 			if(is.na(best_match)) {
-				Warnings <- c(Warnings, paste("(-p) population: there is no match with", argv$population, "specified with -p option, Yoruba is taken."))
+				Warnings <- c(Warnings, paste("(-p) population: there is no match with", argv$population, "specified with -p option, Mbuti is taken."))
 				argv$population <- NULL
 			} else {
 				Warnings <- c(Warnings, paste("(-p) population: the best match for", argv$population, "is", best_match))
