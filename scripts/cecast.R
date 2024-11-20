@@ -35,10 +35,10 @@ parser$add_argument("-k", dest="chromosomes",
 help="Chromosome(s) to be considered. 'A|a' is for all autosomes, 'X|x' for X and 1..22 for any other chromosome.", default='1:22', type="character")
 
 parser$add_argument("-p", dest="population",
-help="Human population as source of contaminantion. Default is Yoruba, and the ohers are: AncientCtrl, Dai, French, Han, Mandenka, Mbuti, Papuan, San, Sardinian.", default="Yoruba", type="character")
+help="Human population as source of contaminantion. Default is Mbuti, and the ohers are: Dai, French, Han, Mandenka, Papuan, San, Sardinian, Yoruba, Karitiana", default="Mbuti", type="character")
 
 parser$add_argument("-r", dest="human_reference",
-help="The human sample to be used: m for Mbuti (default) and y for Yoruba. Notice that Yoruba is the same individual as the one for source of contamination. Therefore, another individual should be specified with -p. ", default="m", type="character")
+help="The human sample to be used: y for Yoruba (default) and m for Mbuti. Notice that Yoruba is the same individual as the one for source of contamination, while the Mbuti is a differenct individual. Therefore, another individual should be specified with -p. ", default="m", type="character")
 
 parser$add_argument("-e", dest="exclude_class",
 help="Remove a given class of sites (lineages) for the analyses. Use the commas to separate the different classes.", type="character")
@@ -212,8 +212,8 @@ if(sum(!is.null(argv$population) & nchar(argv$population) > 2) == 1) {
 # the human as a reference, this prevent the error in case is not specified as 'y' or 'm'. 
 human_reference <- seq_match(argv$human_reference, c("y","m"))
 if(is.na(human_reference)) {
-	human_reference = "m"
-	Warnings <- c(Warnings, paste("(-r) reference: no match for human reference", argv$population, ", m (Mbuti) is chosen as by default."))
+	human_reference = "y"
+	Warnings <- c(Warnings, paste("(-r) reference: no match for human reference", argv$population, ", y (Yoruba) is chosen as by default."))
 }
 
 # Make sure that type and number of bootstraps are compatible.
